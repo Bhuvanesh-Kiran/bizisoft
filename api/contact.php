@@ -1,10 +1,19 @@
 <?php
-require_once 'includes/config.php';
+// ── PATH RESOLUTION ─────────────────────────────────────────────
+// Vercel executes PHP files from an internal /api/ subdirectory,
+// so relative paths like 'includes/config.php' break.
+// dirname(__DIR__) walks up one level from /api/ to the project root.
+// On XAMPP, __DIR__ IS the root, so dirname(__DIR__) goes one level too
+// high — we detect this and fall back to __DIR__ itself.
+// ────────────────────────────────────────────────────────────────
+$root = file_exists(dirname(__DIR__) . '/includes/config.php')
+        ? dirname(__DIR__)   // Vercel: file is in /api/, go up to root
+        : __DIR__;           // XAMPP:  file is already at root
 
-/* Load PHPMailer from the vendor folder */
-require_once 'vendor/PHPMailer/Exception.php';
-require_once 'vendor/PHPMailer/PHPMailer.php';
-require_once 'vendor/PHPMailer/SMTP.php';
+require_once $root . '/includes/config.php';
+require_once $root . '/vendor/PHPMailer/Exception.php';
+require_once $root . '/vendor/PHPMailer/PHPMailer.php';
+require_once $root . '/vendor/PHPMailer/SMTP.php';
 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
@@ -32,7 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['contact_submit'])) {
   $formData = compact('name','phone','email','biz','plan','message');
 
   if (!empty($honey)) {
-    $formSuccess = true; // silent for bots
+    $formSuccess = true;
 
   } elseif (empty($name)) {
     $formError = 'Please enter your name.';
@@ -48,21 +57,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['contact_submit'])) {
     $mail = new PHPMailer(true);
 
     try {
-      /* SMTP via Gmail */
       $mail->isSMTP();
       $mail->Host       = 'smtp.gmail.com';
       $mail->SMTPAuth   = true;
       $mail->Username   = 'bhuvibarla.2004@gmail.com';
-      $mail->Password   = 'hukx pkzc hocu nwzs'; // Gmail App Password
+      $mail->Password   = 'hukx pkzc hocu nwzs';
       $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
       $mail->Port       = 587;
 
-      /* Email setup */
       $mail->setFrom('noreply@bizisoft.com', 'Bizisoft Website');
-      $mail->addAddress(SITE_EMAIL); // → contact@bizisoft.com
-      $mail->addReplyTo($email, $name); // reply goes back to customer
+      $mail->addAddress(SITE_EMAIL);
+      $mail->addReplyTo($email, $name);
 
-      /* Plain text body */
       $mail->isHTML(false);
       $mail->Subject = "New Enquiry from {$name} — Bizisoft";
 
@@ -80,7 +86,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['contact_submit'])) {
       $mail->Body = $body;
       $mail->send();
 
-      /* Post-Redirect-Get — no duplicate submit on refresh */
       header('Location: contact.php?sent=1');
       exit;
 
@@ -95,7 +100,7 @@ if (isset($_GET['sent']) && $_GET['sent'] === '1') {
 }
 
 $preselectedPlan = clean($_GET['plan'] ?? '');
-require_once 'includes/header.php';
+require_once $root . '/includes/header.php';
 ?>
 
 <!-- ══ HERO ══ -->
@@ -175,7 +180,6 @@ require_once 'includes/header.php';
 
         <form method="POST" action="contact.php" novalidate>
 
-          <!-- Bot trap -->
           <input type="text" name="website" style="display:none;" tabindex="-1" autocomplete="off" />
 
           <div class="form-row">
@@ -283,4 +287,4 @@ require_once 'includes/header.php';
   </div>
 </section>
 
-<?php require_once 'includes/footer.php'; ?>
+<?php require_once $root . '/includes/footer.php'; ?>

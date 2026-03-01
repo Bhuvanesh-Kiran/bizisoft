@@ -4,15 +4,23 @@ use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;
 use PHPMailer\PHPMailer\Exception;
 
-require_once 'includes/config.php';
+/**
+ * FIX: Use __DIR__ to ensure absolute paths on Vercel
+ */
+require_once __DIR__ . '/includes/config.php';
 
-// Load PHPMailer files manually from your vendor folder
-require 'vendor/PHPMailer/Exception.php';
-require 'vendor/PHPMailer/PHPMailer.php';
-require 'vendor/PHPMailer/SMTP.php';
+// Load PHPMailer files using absolute paths
+require __DIR__ . '/vendor/PHPMailer/Exception.php';
+require __DIR__ . '/vendor/PHPMailer/PHPMailer.php';
+require __DIR__ . '/vendor/PHPMailer/SMTP.php';
 
 $pageTitle = 'Contact Us';
 $metaDesc  = 'Contact Bizisoft — Get in touch for a demo or to start your plan. Email: contact@bizisoft.com | Phone: +91 90307 61831 | Visakhapatnam.';
+
+/* ═══════════════════════════════════════════
+    FORM HANDLER
+═══════════════════════════════════════════ */
+// ... [rest of your logic remains the same]
 
 /* ═══════════════════════════════════════════
    FORM HANDLER

@@ -1,32 +1,12 @@
 <?php
-// Import PHPMailer classes into the global namespace
-use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\SMTP;
-use PHPMailer\PHPMailer\Exception;
+require_once 'includes/config.php';
 
-/**
- * VERCEL PATH FIX: 
- * We calculate the absolute root directory by going up one level 
- * from the /api/ folder where this script is executed.
- */
-$basePath = dirname(__DIR__);
-
-require_once $basePath . '/includes/config.php';
-
-// Load PHPMailer files using absolute paths
-require $basePath . '/vendor/PHPMailer/Exception.php';
-require $basePath . '/vendor/PHPMailer/PHPMailer.php';
-require $basePath . '/vendor/PHPMailer/SMTP.php';
 $pageTitle = 'Contact Us';
 $metaDesc  = 'Contact Bizisoft — Get in touch for a demo or to start your plan. Email: contact@bizisoft.com | Phone: +91 90307 61831 | Visakhapatnam.';
 
 /* ═══════════════════════════════════════════
-    FORM HANDLER
-═══════════════════════════════════════════ */
-// ... [rest of your logic remains the same]
-
-/* ═══════════════════════════════════════════
-   FORM HANDLER
+   FORM HANDLER — uses PHP built-in mail()
+   No PHPMailer, no database required.
 ═══════════════════════════════════════════ */
 $formSuccess = false;
 $formError   = '';
@@ -34,81 +14,68 @@ $formData    = [];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['contact_submit'])) {
 
-    /* Sanitise inputs using the helper from config.php */
-    $name    = clean($_POST['name']    ?? '');
-    $phone   = clean($_POST['phone']   ?? '');
-    $email   = filter_var(trim($_POST['email'] ?? ''), FILTER_SANITIZE_EMAIL);
-    $biz     = clean($_POST['biz']     ?? '');
-    $plan    = clean($_POST['plan']    ?? '');
-    $message = clean($_POST['message'] ?? '');
-    $honey   = $_POST['website'] ?? ''; // hidden bot trap
+  $name    = clean($_POST['name']    ?? '');
+  $phone   = clean($_POST['phone']   ?? '');
+  $email   = filter_var(trim($_POST['email'] ?? ''), FILTER_SANITIZE_EMAIL);
+  $biz     = clean($_POST['biz']     ?? '');
+  $plan    = clean($_POST['plan']    ?? '');
+  $message = clean($_POST['message'] ?? '');
+  $honey   = $_POST['website'] ?? '';
 
-    $formData = compact('name','phone','email','biz','plan','message');
+  $formData = compact('name','phone','email','biz','plan','message');
 
-    /* Bot trap check */
-    if (!empty($honey)) {
-        $formSuccess = true; // Silently succeed to trick bots
-    }
-    /* Validation logic */
-    elseif (empty($name)) {
-        $formError = 'Please enter your name.';
-    } elseif (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        $formError = 'Please enter a valid email address.';
-    } elseif (empty($message)) {
-        $formError = 'Please write a message.';
+  if (!empty($honey)) {
+    $formSuccess = true; // silent for bots
+
+  } elseif (empty($name)) {
+    $formError = 'Please enter your name.';
+
+  } elseif (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+    $formError = 'Please enter a valid email address.';
+
+  } elseif (empty($message)) {
+    $formError = 'Please write a message.';
+
+  } else {
+
+    $body  = "NEW CONTACT FORM SUBMISSION\n";
+    $body .= "===================================\n\n";
+    $body .= "Name          : {$name}\n";
+    $body .= "Phone         : {$phone}\n";
+    $body .= "Email         : {$email}\n";
+    $body .= "Business Type : {$biz}\n";
+    $body .= "Interested In : {$plan}\n\n";
+    $body .= "Message:\n{$message}\n\n";
+    $body .= "===================================\n";
+    $body .= "Sent from bizisoft.com contact form\n";
+
+    $headers  = "From: Bizisoft Website <noreply@bizisoft.com>\r\n";
+    $headers .= "Reply-To: {$name} <{$email}>\r\n";
+    $headers .= "Content-Type: text/plain; charset=UTF-8\r\n";
+    $headers .= "X-Mailer: PHP/" . phpversion();
+
+    $subject = "New Enquiry from {$name} — Bizisoft";
+
+    $sent = mail(SITE_EMAIL, $subject, $body, $headers);
+
+    if ($sent) {
+      header('Location: contact.php?sent=1');
+      exit;
     } else {
-        
-        $mail = new PHPMailer(true);
-
-        try {
-            // --- SMTP SETTINGS ---
-            $mail->isSMTP();
-            $mail->Host       = 'smtp.gmail.com';
-            $mail->SMTPAuth   = true;
-            $mail->Username   = 'bhuvibarla.2004@gmail.com';
-            $mail->Password   = 'hukx pkzc hocu nwzs'; // Your Google App Password
-            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-            $mail->Port       = 587;
-
-            // --- EMAIL CONTENT ---
-            $mail->setFrom('noreply@bizisoft.com', 'Bizisoft Website');
-            $mail->addAddress(SITE_EMAIL); // Forwarding to contact@bizisoft.com
-            $mail->addReplyTo($email, $name); // Sets customer as the reply target
-
-            $mail->isHTML(false); // Plain text format for better deliverability
-            $mail->Subject = "New Enquiry from {$name} — Bizisoft";
-            
-            $body  = "NEW CONTACT FORM SUBMISSION\n";
-            $body .= "═══════════════════════════════════\n\n";
-            $body .= "Name          : {$name}\n";
-            $body .= "Phone         : {$phone}\n";
-            $body .= "Email         : {$email}\n";
-            $body .= "Business Type : {$biz}\n";
-            $body .= "Interested In : {$plan}\n\n";
-            $body .= "Message:\n{$message}\n";
-
-            $mail->Body = $body;
-
-            $mail->send();
-            
-            // Post-Redirect-Get pattern to prevent form resubmission on refresh
-            header('Location: contact.php?sent=1');
-            exit;
-        } catch (Exception $e) {
-            $formError = "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
-        }
+      $formError = 'Sorry, your message could not be sent right now. Please email us directly at ' . SITE_EMAIL;
     }
+  }
 }
 
-/* Trigger success alert after redirect */
 if (isset($_GET['sent']) && $_GET['sent'] === '1') {
-    $formSuccess = true;
+  $formSuccess = true;
 }
 
 $preselectedPlan = clean($_GET['plan'] ?? '');
 require_once 'includes/header.php';
 ?>
 
+<!-- ══ HERO ══ -->
 <section class="page-hero" style="background:linear-gradient(180deg,#0e0000 0%,var(--black) 100%); padding-bottom:60px;">
   <div class="hero-bg-text">CONTACT</div>
   <div class="container" style="text-align:center; position:relative; z-index:1;">
@@ -122,10 +89,12 @@ require_once 'includes/header.php';
   </div>
 </section>
 
+<!-- ══ CONTACT LAYOUT ══ -->
 <section class="contact-page">
   <div class="container">
     <div class="contact-layout">
 
+      <!-- LEFT: Contact Info -->
       <div class="contact-info-col reveal-left">
         <div class="section-eyebrow">Contact Details</div>
         <h2>REACH US<br>ANYTIME</h2>
@@ -164,23 +133,26 @@ require_once 'includes/header.php';
         </div>
       </div>
 
+      <!-- RIGHT: Contact Form -->
       <div class="contact-form-wrap reveal-right">
         <h3>SEND A MESSAGE</h3>
         <p>Fill in the form and we'll get back to you promptly.</p>
 
         <?php if ($formSuccess): ?>
         <div class="alert alert-success">
-          ✅   Your message has been sent! We'll contact you within 24 hours.
+          ✅ &nbsp;Your message has been sent! We'll contact you within 24 hours.
         </div>
         <?php endif; ?>
 
         <?php if ($formError): ?>
         <div class="alert alert-error">
-          ⚠️   <?= htmlspecialchars($formError) ?>
+          ⚠️ &nbsp;<?= htmlspecialchars($formError) ?>
         </div>
         <?php endif; ?>
 
         <form method="POST" action="contact.php" novalidate>
+
+          <!-- Bot trap -->
           <input type="text" name="website" style="display:none;" tabindex="-1" autocomplete="off" />
 
           <div class="form-row">
@@ -211,8 +183,17 @@ require_once 'includes/header.php';
               <select id="f_biz" name="biz">
                 <option value="">Select type…</option>
                 <?php
-                $bizTypes = ['Restaurant (Single Outlet)', 'Tiffin Centre', 'Multi-Branch Restaurant', 'Cloud Kitchen', 'Cafeteria / Canteen', 'Hotel Restaurant', 'Fast Food Outlet', 'Other'];
-                foreach($bizTypes as $t):
+                $bizTypes = [
+                  'Restaurant (Single Outlet)',
+                  'Tiffin Centre',
+                  'Multi-Branch Restaurant',
+                  'Cloud Kitchen',
+                  'Cafeteria / Canteen',
+                  'Hotel Restaurant',
+                  'Fast Food Outlet',
+                  'Other',
+                ];
+                foreach ($bizTypes as $t):
                   $sel = (($formData['biz'] ?? '') === $t) ? 'selected' : '';
                 ?>
                 <option <?= $sel ?>><?= htmlspecialchars($t) ?></option>
@@ -230,9 +211,9 @@ require_once 'includes/header.php';
                   'Business — ₹18,500 + GST (Up to 5 Branches)',
                   'Not sure — need recommendation',
                 ];
-                foreach($planOpts as $opt):
-                  $selPlan = ($formData['plan'] ?? $preselectedPlan);
-                  $selected = (strpos($opt, $selPlan) !== false && !empty($selPlan)) ? 'selected' : '';
+                foreach ($planOpts as $opt):
+                  $selPlan  = ($formData['plan'] ?? $preselectedPlan);
+                  $selected = (!empty($selPlan) && strpos($opt, $selPlan) !== false) ? 'selected' : '';
                 ?>
                 <option <?= $selected ?>><?= htmlspecialchars($opt) ?></option>
                 <?php endforeach; ?>
@@ -243,12 +224,15 @@ require_once 'includes/header.php';
           <div class="form-group">
             <label for="f_msg">Message *</label>
             <textarea id="f_msg" name="message"
-                      placeholder="Tell us about your business, tables, or specific questions…"><?= htmlspecialchars($formData['message'] ?? '') ?></textarea>
+                      placeholder="Tell us about your business, number of tables, or any specific questions…"><?= htmlspecialchars($formData['message'] ?? '') ?></textarea>
           </div>
 
-          <button type="submit" name="contact_submit" value="1" class="btn btn-red" style="width:100%;justify-content:center;font-size:1rem;padding:16px;">
+          <button type="submit" name="contact_submit" value="1"
+                  class="btn btn-red"
+                  style="width:100%;justify-content:center;font-size:1rem;padding:16px;">
             Send Message →
           </button>
+
         </form>
       </div>
 
@@ -256,16 +240,20 @@ require_once 'includes/header.php';
   </div>
 </section>
 
+<!-- ══ LOCATION ══ -->
 <section style="padding:0 0 80px;">
   <div class="container">
     <div style="background:var(--black2); border:1px solid var(--border); border-radius:var(--r); overflow:hidden;">
-      <div style="background:linear-gradient(135deg,var(--black3),var(--black2)); height:200px; display:flex;align-items:center;justify-content:center;gap:20px; border-bottom:1px solid var(--border);">
+      <div style="background:linear-gradient(135deg,var(--black3),var(--black2)); height:200px; display:flex; align-items:center; justify-content:center; gap:20px; border-bottom:1px solid var(--border);">
         <div style="font-size:3rem;">📍</div>
         <div>
           <div style="font-family:var(--fh);font-size:1.4rem;letter-spacing:1px;color:var(--white);">VISAKHAPATNAM</div>
           <div style="font-size:0.85rem;color:var(--muted);margin-top:4px;">Andhra Pradesh, India</div>
-          <a href="https://maps.google.com/?q=Visakhapatnam,Andhra+Pradesh" target="_blank" rel="noopener"
-             style="font-size:0.78rem;color:var(--red);margin-top:8px;display:inline-block;">Open in Google Maps →</a>
+          <a href="https://maps.google.com/?q=Visakhapatnam,Andhra+Pradesh"
+             target="_blank" rel="noopener"
+             style="font-size:0.78rem;color:var(--red);margin-top:8px;display:inline-block;">
+            Open in Google Maps →
+          </a>
         </div>
       </div>
     </div>

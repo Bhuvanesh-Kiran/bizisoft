@@ -1,12 +1,19 @@
 <?php
 require_once 'includes/config.php';
 
+/* Load PHPMailer from the vendor folder */
+require_once 'vendor/PHPMailer/Exception.php';
+require_once 'vendor/PHPMailer/PHPMailer.php';
+require_once 'vendor/PHPMailer/SMTP.php';
+
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
 $pageTitle = 'Contact Us';
 $metaDesc  = 'Contact Bizisoft — Get in touch for a demo or to start your plan. Email: contact@bizisoft.com | Phone: +91 90307 61831 | Visakhapatnam.';
 
 /* ═══════════════════════════════════════════
-   FORM HANDLER — uses PHP built-in mail()
-   No PHPMailer, no database required.
+   FORM HANDLER
 ═══════════════════════════════════════════ */
 $formSuccess = false;
 $formError   = '';
@@ -38,31 +45,47 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['contact_submit'])) {
 
   } else {
 
-    $body  = "NEW CONTACT FORM SUBMISSION\n";
-    $body .= "===================================\n\n";
-    $body .= "Name          : {$name}\n";
-    $body .= "Phone         : {$phone}\n";
-    $body .= "Email         : {$email}\n";
-    $body .= "Business Type : {$biz}\n";
-    $body .= "Interested In : {$plan}\n\n";
-    $body .= "Message:\n{$message}\n\n";
-    $body .= "===================================\n";
-    $body .= "Sent from bizisoft.com contact form\n";
+    $mail = new PHPMailer(true);
 
-    $headers  = "From: Bizisoft Website <noreply@bizisoft.com>\r\n";
-    $headers .= "Reply-To: {$name} <{$email}>\r\n";
-    $headers .= "Content-Type: text/plain; charset=UTF-8\r\n";
-    $headers .= "X-Mailer: PHP/" . phpversion();
+    try {
+      /* SMTP via Gmail */
+      $mail->isSMTP();
+      $mail->Host       = 'smtp.gmail.com';
+      $mail->SMTPAuth   = true;
+      $mail->Username   = 'bhuvibarla.2004@gmail.com';
+      $mail->Password   = 'hukx pkzc hocu nwzs'; // Gmail App Password
+      $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+      $mail->Port       = 587;
 
-    $subject = "New Enquiry from {$name} — Bizisoft";
+      /* Email setup */
+      $mail->setFrom('noreply@bizisoft.com', 'Bizisoft Website');
+      $mail->addAddress(SITE_EMAIL); // → contact@bizisoft.com
+      $mail->addReplyTo($email, $name); // reply goes back to customer
 
-    $sent = mail(SITE_EMAIL, $subject, $body, $headers);
+      /* Plain text body */
+      $mail->isHTML(false);
+      $mail->Subject = "New Enquiry from {$name} — Bizisoft";
 
-    if ($sent) {
+      $body  = "NEW CONTACT FORM SUBMISSION\n";
+      $body .= "===================================\n\n";
+      $body .= "Name          : {$name}\n";
+      $body .= "Phone         : {$phone}\n";
+      $body .= "Email         : {$email}\n";
+      $body .= "Business Type : {$biz}\n";
+      $body .= "Interested In : {$plan}\n\n";
+      $body .= "Message:\n{$message}\n\n";
+      $body .= "===================================\n";
+      $body .= "Sent from bizisoft.com contact form\n";
+
+      $mail->Body = $body;
+      $mail->send();
+
+      /* Post-Redirect-Get — no duplicate submit on refresh */
       header('Location: contact.php?sent=1');
       exit;
-    } else {
-      $formError = 'Sorry, your message could not be sent right now. Please email us directly at ' . SITE_EMAIL;
+
+    } catch (Exception $e) {
+      $formError = 'Message could not be sent. Please try again or email us directly at ' . SITE_EMAIL;
     }
   }
 }

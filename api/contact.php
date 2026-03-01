@@ -5,15 +5,14 @@ use PHPMailer\PHPMailer\SMTP;
 use PHPMailer\PHPMailer\Exception;
 
 /**
- * VERCEL PATH FIX: 
- * If Vercel runs this from /api/contact.php, we need to go UP one level
- * to find the /vendor and /includes folders in the root.
+ * VERCEL ABSOLUTE PATH FIX
+ * This calculates the root directory regardless of where Vercel places the file.
  */
-$rootDir = dirname(__DIR__); 
+$rootDir = realpath(__DIR__ . '/..');
 
 require_once $rootDir . '/includes/config.php';
 
-// Load PHPMailer files using the calculated root directory
+// Load PHPMailer files using the absolute root path
 require $rootDir . '/vendor/PHPMailer/Exception.php';
 require $rootDir . '/vendor/PHPMailer/PHPMailer.php';
 require $rootDir . '/vendor/PHPMailer/SMTP.php';

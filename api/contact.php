@@ -1,98 +1,13 @@
 <?php
-// Import PHPMailer classes into the global namespace
-use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\SMTP;
-use PHPMailer\PHPMailer\Exception;
-
-// Simple relative paths — Vercel sets CWD to project root correctly
-require 'includes/config.php';
-require 'vendor/PHPMailer/Exception.php';
-require 'vendor/PHPMailer/PHPMailer.php';
-require 'vendor/PHPMailer/SMTP.php';
+$root = file_exists(dirname(__DIR__) . '/includes/config.php')
+        ? dirname(__DIR__) : __DIR__;
+require_once $root . '/includes/config.php';
 
 $pageTitle = 'Contact Us';
 $metaDesc  = 'Contact Bizisoft — Get in touch for a demo or to start your plan. Email: contact@bizisoft.com | Phone: +91 90307 61831 | Visakhapatnam.';
 
-/* ═══════════════════════════════════════════
-   FORM HANDLER
-═══════════════════════════════════════════ */
-$formSuccess = false;
-$formError   = '';
-$formData    = [];
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['contact_submit'])) {
-
-  $name    = clean($_POST['name']    ?? '');
-  $phone   = clean($_POST['phone']   ?? '');
-  $email   = filter_var(trim($_POST['email'] ?? ''), FILTER_SANITIZE_EMAIL);
-  $biz     = clean($_POST['biz']     ?? '');
-  $plan    = clean($_POST['plan']    ?? '');
-  $message = clean($_POST['message'] ?? '');
-  $honey   = $_POST['website'] ?? '';
-
-  $formData = compact('name','phone','email','biz','plan','message');
-
-  if (!empty($honey)) {
-    $formSuccess = true;
-
-  } elseif (empty($name)) {
-    $formError = 'Please enter your name.';
-
-  } elseif (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
-    $formError = 'Please enter a valid email address.';
-
-  } elseif (empty($message)) {
-    $formError = 'Please write a message.';
-
-  } else {
-
-    $mail = new PHPMailer(true);
-
-    try {
-      $mail->isSMTP();
-      $mail->Host       = 'smtp.gmail.com';
-      $mail->SMTPAuth   = true;
-      $mail->Username   = 'bhuvibarla.2004@gmail.com';
-      $mail->Password   = 'hukx pkzc hocu nwzs';
-      $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-      $mail->Port       = 587;
-
-      $mail->setFrom('noreply@bizisoft.com', 'Bizisoft Website');
-      $mail->addAddress(SITE_EMAIL);
-      $mail->addReplyTo($email, $name);
-
-      $mail->isHTML(false);
-      $mail->Subject = "New Enquiry from {$name} — Bizisoft";
-
-      $body  = "NEW CONTACT FORM SUBMISSION\n";
-      $body .= "===================================\n\n";
-      $body .= "Name          : {$name}\n";
-      $body .= "Phone         : {$phone}\n";
-      $body .= "Email         : {$email}\n";
-      $body .= "Business Type : {$biz}\n";
-      $body .= "Interested In : {$plan}\n\n";
-      $body .= "Message:\n{$message}\n\n";
-      $body .= "===================================\n";
-      $body .= "Sent from bizisoft.com contact form\n";
-
-      $mail->Body = $body;
-      $mail->send();
-
-      header('Location: contact.php?sent=1');
-      exit;
-
-    } catch (Exception $e) {
-      $formError = 'Message could not be sent. Please try again or email us directly at ' . SITE_EMAIL;
-    }
-  }
-}
-
-if (isset($_GET['sent']) && $_GET['sent'] === '1') {
-  $formSuccess = true;
-}
-
 $preselectedPlan = clean($_GET['plan'] ?? '');
-require 'includes/header.php';
+require_once $root . '/includes/header.php';
 ?>
 
 <!-- ══ HERO ══ -->
@@ -114,6 +29,7 @@ require 'includes/header.php';
   <div class="container">
     <div class="contact-layout">
 
+      <!-- LEFT: Contact Info -->
       <div class="contact-info-col reveal-left">
         <div class="section-eyebrow">Contact Details</div>
         <h2>REACH US<br>ANYTIME</h2>
@@ -126,6 +42,7 @@ require 'includes/header.php';
             <div class="ci-value"><a href="mailto:<?= SITE_EMAIL ?>"><?= SITE_EMAIL ?></a></div>
           </div>
         </div>
+
         <div class="contact-item">
           <div class="contact-ic">📞</div>
           <div>
@@ -133,6 +50,7 @@ require 'includes/header.php';
             <div class="ci-value"><a href="tel:<?= SITE_PHONE_RAW ?>"><?= SITE_PHONE ?></a></div>
           </div>
         </div>
+
         <div class="contact-item">
           <div class="contact-ic">📍</div>
           <div>
@@ -140,6 +58,7 @@ require 'includes/header.php';
             <div class="ci-value"><?= SITE_ADDRESS ?></div>
           </div>
         </div>
+
         <div class="contact-item">
           <div class="contact-ic">🕐</div>
           <div>
@@ -149,56 +68,90 @@ require 'includes/header.php';
         </div>
       </div>
 
+      <!-- RIGHT: Contact Form — powered by Formspree -->
       <div class="contact-form-wrap reveal-right">
         <h3>SEND A MESSAGE</h3>
         <p>Fill in the form and we'll get back to you promptly.</p>
 
-        <?php if ($formSuccess): ?>
-        <div class="alert alert-success">✅ &nbsp;Your message has been sent! We'll contact you within 24 hours.</div>
-        <?php endif; ?>
-        <?php if ($formError): ?>
-        <div class="alert alert-error">⚠️ &nbsp;<?= htmlspecialchars($formError) ?></div>
+        <!-- Success message shown after Formspree redirects back with ?sent=1 -->
+        <?php if (isset($_GET['sent']) && $_GET['sent'] === '1'): ?>
+        <div class="alert alert-success">
+          ✅ &nbsp;Your message has been sent! We'll contact you within 24 hours.
+        </div>
         <?php endif; ?>
 
-        <form method="POST" action="contact.php" novalidate>
-          <input type="text" name="website" style="display:none;" tabindex="-1" autocomplete="off" />
+        <!--
+          FORMSPREE SETUP (one-time, 2 minutes):
+          1. Go to https://formspree.io and sign up free
+          2. Click "New Form" → name it "Bizisoft Contact"
+          3. Copy your form endpoint (looks like https://formspree.io/f/xyzabcde)
+          4. Replace YOUR_FORMSPREE_ID below with just the ID part (e.g. xyzabcde)
+        -->
+        <form
+          action="https://formspree.io/f/YOUR_FORMSPREE_ID"
+          method="POST"
+          novalidate>
+
+          <!-- Tell Formspree where to redirect after success -->
+          <input type="hidden" name="_next"    value="https://YOUR-SITE.vercel.app/contact.php?sent=1" />
+          <!-- Email subject line in your inbox -->
+          <input type="hidden" name="_subject" value="New Enquiry — Bizisoft Website" />
+          <!-- Bot trap -->
+          <input type="text"   name="_gotcha"  style="display:none;" tabindex="-1" autocomplete="off" />
 
           <div class="form-row">
             <div class="form-group">
               <label for="f_name">Full Name *</label>
-              <input type="text" id="f_name" name="name" placeholder="Your full name"
-                     value="<?= htmlspecialchars($formData['name'] ?? '') ?>" required />
+              <input type="text" id="f_name" name="name"
+                     placeholder="Your full name" required />
             </div>
             <div class="form-group">
               <label for="f_phone">Phone / WhatsApp</label>
-              <input type="tel" id="f_phone" name="phone" placeholder="+91 98765 43210"
-                     value="<?= htmlspecialchars($formData['phone'] ?? '') ?>" />
+              <input type="tel" id="f_phone" name="phone"
+                     placeholder="+91 98765 43210" />
             </div>
           </div>
 
           <div class="form-group">
             <label for="f_email">Email Address *</label>
-            <input type="email" id="f_email" name="email" placeholder="you@yourrestaurant.com"
-                   value="<?= htmlspecialchars($formData['email'] ?? '') ?>" required />
+            <input type="email" id="f_email" name="email"
+                   placeholder="you@yourrestaurant.com" required />
           </div>
 
           <div class="form-row">
             <div class="form-group">
               <label for="f_biz">Business Type</label>
-              <select id="f_biz" name="biz">
+              <select id="f_biz" name="Business Type">
                 <option value="">Select type…</option>
-                <?php foreach(['Restaurant (Single Outlet)','Tiffin Centre','Multi-Branch Restaurant','Cloud Kitchen','Cafeteria / Canteen','Hotel Restaurant','Fast Food Outlet','Other'] as $t): ?>
-                <option <?= (($formData['biz'] ?? '') === $t) ? 'selected' : '' ?>><?= htmlspecialchars($t) ?></option>
+                <?php
+                $bizTypes = [
+                  'Restaurant (Single Outlet)',
+                  'Tiffin Centre',
+                  'Multi-Branch Restaurant',
+                  'Cloud Kitchen',
+                  'Cafeteria / Canteen',
+                  'Hotel Restaurant',
+                  'Fast Food Outlet',
+                  'Other',
+                ];
+                foreach ($bizTypes as $t): ?>
+                <option><?= htmlspecialchars($t) ?></option>
                 <?php endforeach; ?>
               </select>
             </div>
             <div class="form-group">
               <label for="f_plan">Interested Plan</label>
-              <select id="f_plan" name="plan">
+              <select id="f_plan" name="Interested Plan">
                 <option value="">Select plan…</option>
-                <?php foreach(['Starter — ₹8,500 + GST (1 Outlet)','Growth — ₹12,500 + GST (Up to 3 Branches)','Business — ₹18,500 + GST (Up to 5 Branches)','Not sure — need recommendation'] as $opt):
-                  $selPlan = ($formData['plan'] ?? $preselectedPlan);
-                  $selected = (!empty($selPlan) && strpos($opt, $selPlan) !== false) ? 'selected' : '';
+                <?php
+                $planOpts = [
+                  'Starter — ₹8,500 + GST (1 Outlet)',
+                  'Growth — ₹12,500 + GST (Up to 3 Branches)',
+                  'Business — ₹18,500 + GST (Up to 5 Branches)',
+                  'Not sure — need recommendation',
+                ];
+                foreach ($planOpts as $opt):
+                  $selected = (!empty($preselectedPlan) && strpos($opt, $preselectedPlan) !== false) ? 'selected' : '';
                 ?>
                 <option <?= $selected ?>><?= htmlspecialchars($opt) ?></option>
                 <?php endforeach; ?>
@@ -209,13 +162,14 @@ require 'includes/header.php';
           <div class="form-group">
             <label for="f_msg">Message *</label>
             <textarea id="f_msg" name="message"
-                      placeholder="Tell us about your business, number of tables, or any specific questions…"><?= htmlspecialchars($formData['message'] ?? '') ?></textarea>
+                      placeholder="Tell us about your business, number of tables, or any specific questions…"></textarea>
           </div>
 
-          <button type="submit" name="contact_submit" value="1" class="btn btn-red"
+          <button type="submit" class="btn btn-red"
                   style="width:100%;justify-content:center;font-size:1rem;padding:16px;">
             Send Message →
           </button>
+
         </form>
       </div>
 
@@ -232,12 +186,15 @@ require 'includes/header.php';
         <div>
           <div style="font-family:var(--fh);font-size:1.4rem;letter-spacing:1px;color:var(--white);">VISAKHAPATNAM</div>
           <div style="font-size:0.85rem;color:var(--muted);margin-top:4px;">Andhra Pradesh, India</div>
-          <a href="https://maps.google.com/?q=Visakhapatnam,Andhra+Pradesh" target="_blank" rel="noopener"
-             style="font-size:0.78rem;color:var(--red);margin-top:8px;display:inline-block;">Open in Google Maps →</a>
+          <a href="https://maps.google.com/?q=Visakhapatnam,Andhra+Pradesh"
+             target="_blank" rel="noopener"
+             style="font-size:0.78rem;color:var(--red);margin-top:8px;display:inline-block;">
+            Open in Google Maps →
+          </a>
         </div>
       </div>
     </div>
   </div>
 </section>
 
-<?php require 'includes/footer.php'; ?>
+<?php require_once $root . '/includes/footer.php'; ?>

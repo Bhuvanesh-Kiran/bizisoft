@@ -1,22 +1,14 @@
 <?php
-// ── PATH RESOLUTION ─────────────────────────────────────────────
-// Vercel executes PHP files from an internal /api/ subdirectory,
-// so relative paths like 'includes/config.php' break.
-// dirname(__DIR__) walks up one level from /api/ to the project root.
-// On XAMPP, __DIR__ IS the root, so dirname(__DIR__) goes one level too
-// high — we detect this and fall back to __DIR__ itself.
-// ────────────────────────────────────────────────────────────────
-$root = file_exists(dirname(__DIR__) . '/includes/config.php')
-        ? dirname(__DIR__)   // Vercel: file is in /api/, go up to root
-        : __DIR__;           // XAMPP:  file is already at root
-
-require_once $root . '/includes/config.php';
-require_once $root . '/vendor/PHPMailer/Exception.php';
-require_once $root . '/vendor/PHPMailer/PHPMailer.php';
-require_once $root . '/vendor/PHPMailer/SMTP.php';
-
+// Import PHPMailer classes into the global namespace
 use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\SMTP;
 use PHPMailer\PHPMailer\Exception;
+
+// Simple relative paths — Vercel sets CWD to project root correctly
+require 'includes/config.php';
+require 'vendor/PHPMailer/Exception.php';
+require 'vendor/PHPMailer/PHPMailer.php';
+require 'vendor/PHPMailer/SMTP.php';
 
 $pageTitle = 'Contact Us';
 $metaDesc  = 'Contact Bizisoft — Get in touch for a demo or to start your plan. Email: contact@bizisoft.com | Phone: +91 90307 61831 | Visakhapatnam.';
@@ -100,7 +92,7 @@ if (isset($_GET['sent']) && $_GET['sent'] === '1') {
 }
 
 $preselectedPlan = clean($_GET['plan'] ?? '');
-require_once $root . '/includes/header.php';
+require 'includes/header.php';
 ?>
 
 <!-- ══ HERO ══ -->
@@ -122,7 +114,6 @@ require_once $root . '/includes/header.php';
   <div class="container">
     <div class="contact-layout">
 
-      <!-- LEFT: Contact Info -->
       <div class="contact-info-col reveal-left">
         <div class="section-eyebrow">Contact Details</div>
         <h2>REACH US<br>ANYTIME</h2>
@@ -135,7 +126,6 @@ require_once $root . '/includes/header.php';
             <div class="ci-value"><a href="mailto:<?= SITE_EMAIL ?>"><?= SITE_EMAIL ?></a></div>
           </div>
         </div>
-
         <div class="contact-item">
           <div class="contact-ic">📞</div>
           <div>
@@ -143,7 +133,6 @@ require_once $root . '/includes/header.php';
             <div class="ci-value"><a href="tel:<?= SITE_PHONE_RAW ?>"><?= SITE_PHONE ?></a></div>
           </div>
         </div>
-
         <div class="contact-item">
           <div class="contact-ic">📍</div>
           <div>
@@ -151,7 +140,6 @@ require_once $root . '/includes/header.php';
             <div class="ci-value"><?= SITE_ADDRESS ?></div>
           </div>
         </div>
-
         <div class="contact-item">
           <div class="contact-ic">🕐</div>
           <div>
@@ -161,46 +149,36 @@ require_once $root . '/includes/header.php';
         </div>
       </div>
 
-      <!-- RIGHT: Contact Form -->
       <div class="contact-form-wrap reveal-right">
         <h3>SEND A MESSAGE</h3>
         <p>Fill in the form and we'll get back to you promptly.</p>
 
         <?php if ($formSuccess): ?>
-        <div class="alert alert-success">
-          ✅ &nbsp;Your message has been sent! We'll contact you within 24 hours.
-        </div>
+        <div class="alert alert-success">✅ &nbsp;Your message has been sent! We'll contact you within 24 hours.</div>
         <?php endif; ?>
-
         <?php if ($formError): ?>
-        <div class="alert alert-error">
-          ⚠️ &nbsp;<?= htmlspecialchars($formError) ?>
-        </div>
+        <div class="alert alert-error">⚠️ &nbsp;<?= htmlspecialchars($formError) ?></div>
         <?php endif; ?>
 
         <form method="POST" action="contact.php" novalidate>
-
           <input type="text" name="website" style="display:none;" tabindex="-1" autocomplete="off" />
 
           <div class="form-row">
             <div class="form-group">
               <label for="f_name">Full Name *</label>
-              <input type="text" id="f_name" name="name"
-                     placeholder="Your full name"
+              <input type="text" id="f_name" name="name" placeholder="Your full name"
                      value="<?= htmlspecialchars($formData['name'] ?? '') ?>" required />
             </div>
             <div class="form-group">
               <label for="f_phone">Phone / WhatsApp</label>
-              <input type="tel" id="f_phone" name="phone"
-                     placeholder="+91 98765 43210"
+              <input type="tel" id="f_phone" name="phone" placeholder="+91 98765 43210"
                      value="<?= htmlspecialchars($formData['phone'] ?? '') ?>" />
             </div>
           </div>
 
           <div class="form-group">
             <label for="f_email">Email Address *</label>
-            <input type="email" id="f_email" name="email"
-                   placeholder="you@yourrestaurant.com"
+            <input type="email" id="f_email" name="email" placeholder="you@yourrestaurant.com"
                    value="<?= htmlspecialchars($formData['email'] ?? '') ?>" required />
           </div>
 
@@ -209,21 +187,8 @@ require_once $root . '/includes/header.php';
               <label for="f_biz">Business Type</label>
               <select id="f_biz" name="biz">
                 <option value="">Select type…</option>
-                <?php
-                $bizTypes = [
-                  'Restaurant (Single Outlet)',
-                  'Tiffin Centre',
-                  'Multi-Branch Restaurant',
-                  'Cloud Kitchen',
-                  'Cafeteria / Canteen',
-                  'Hotel Restaurant',
-                  'Fast Food Outlet',
-                  'Other',
-                ];
-                foreach ($bizTypes as $t):
-                  $sel = (($formData['biz'] ?? '') === $t) ? 'selected' : '';
-                ?>
-                <option <?= $sel ?>><?= htmlspecialchars($t) ?></option>
+                <?php foreach(['Restaurant (Single Outlet)','Tiffin Centre','Multi-Branch Restaurant','Cloud Kitchen','Cafeteria / Canteen','Hotel Restaurant','Fast Food Outlet','Other'] as $t): ?>
+                <option <?= (($formData['biz'] ?? '') === $t) ? 'selected' : '' ?>><?= htmlspecialchars($t) ?></option>
                 <?php endforeach; ?>
               </select>
             </div>
@@ -231,15 +196,8 @@ require_once $root . '/includes/header.php';
               <label for="f_plan">Interested Plan</label>
               <select id="f_plan" name="plan">
                 <option value="">Select plan…</option>
-                <?php
-                $planOpts = [
-                  'Starter — ₹8,500 + GST (1 Outlet)',
-                  'Growth — ₹12,500 + GST (Up to 3 Branches)',
-                  'Business — ₹18,500 + GST (Up to 5 Branches)',
-                  'Not sure — need recommendation',
-                ];
-                foreach ($planOpts as $opt):
-                  $selPlan  = ($formData['plan'] ?? $preselectedPlan);
+                <?php foreach(['Starter — ₹8,500 + GST (1 Outlet)','Growth — ₹12,500 + GST (Up to 3 Branches)','Business — ₹18,500 + GST (Up to 5 Branches)','Not sure — need recommendation'] as $opt):
+                  $selPlan = ($formData['plan'] ?? $preselectedPlan);
                   $selected = (!empty($selPlan) && strpos($opt, $selPlan) !== false) ? 'selected' : '';
                 ?>
                 <option <?= $selected ?>><?= htmlspecialchars($opt) ?></option>
@@ -254,12 +212,10 @@ require_once $root . '/includes/header.php';
                       placeholder="Tell us about your business, number of tables, or any specific questions…"><?= htmlspecialchars($formData['message'] ?? '') ?></textarea>
           </div>
 
-          <button type="submit" name="contact_submit" value="1"
-                  class="btn btn-red"
+          <button type="submit" name="contact_submit" value="1" class="btn btn-red"
                   style="width:100%;justify-content:center;font-size:1rem;padding:16px;">
             Send Message →
           </button>
-
         </form>
       </div>
 
@@ -276,15 +232,12 @@ require_once $root . '/includes/header.php';
         <div>
           <div style="font-family:var(--fh);font-size:1.4rem;letter-spacing:1px;color:var(--white);">VISAKHAPATNAM</div>
           <div style="font-size:0.85rem;color:var(--muted);margin-top:4px;">Andhra Pradesh, India</div>
-          <a href="https://maps.google.com/?q=Visakhapatnam,Andhra+Pradesh"
-             target="_blank" rel="noopener"
-             style="font-size:0.78rem;color:var(--red);margin-top:8px;display:inline-block;">
-            Open in Google Maps →
-          </a>
+          <a href="https://maps.google.com/?q=Visakhapatnam,Andhra+Pradesh" target="_blank" rel="noopener"
+             style="font-size:0.78rem;color:var(--red);margin-top:8px;display:inline-block;">Open in Google Maps →</a>
         </div>
       </div>
     </div>
   </div>
 </section>
 
-<?php require_once $root . '/includes/footer.php'; ?>
+<?php require 'includes/footer.php'; ?>

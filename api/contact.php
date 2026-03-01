@@ -1,21 +1,28 @@
 <?php
+
 // Import PHPMailer classes into the global namespace
+
 use PHPMailer\PHPMailer\PHPMailer;
+
 use PHPMailer\PHPMailer\SMTP;
+
 use PHPMailer\PHPMailer\Exception;
 
-/**
- * VERCEL ABSOLUTE PATH FIX
- * This calculates the root directory regardless of where Vercel places the file.
- */
-$rootDir = realpath(__DIR__ . '/..');
 
-require_once $rootDir . '/includes/config.php';
 
-// Load PHPMailer files using the absolute root path
-require $rootDir . '/vendor/PHPMailer/Exception.php';
-require $rootDir . '/vendor/PHPMailer/PHPMailer.php';
-require $rootDir . '/vendor/PHPMailer/SMTP.php';
+require_once 'includes/config.php';
+
+
+
+// Load PHPMailer files manually from your vendor folder
+
+require 'vendor/PHPMailer/Exception.php';
+
+require 'vendor/PHPMailer/PHPMailer.php';
+
+require 'vendor/PHPMailer/SMTP.php';
+
+
 
 $pageTitle = 'Contact Us';
 $metaDesc  = 'Contact Bizisoft — Get in touch for a demo or to start your plan. Email: contact@bizisoft.com | Phone: +91 90307 61831 | Visakhapatnam.';

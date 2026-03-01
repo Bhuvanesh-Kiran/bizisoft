@@ -9,6 +9,10 @@
       "src": "/assets/(.*)",
       "dest": "/assets/$1"
     },
+     {
+      "src": "/vendor/(.*)",
+      "dest": "/vendor/$1"
+    },
     {
       "src": "/(.*)",
       "dest": "/api/$1"

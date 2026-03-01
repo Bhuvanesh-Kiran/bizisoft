@@ -17,10 +17,11 @@
     }
   },
   "routes": [
+    { "src": "/assets/(.*)", "dest": "/assets/$1" },
     { "src": "/", "dest": "/index.php" },
     { "src": "/features", "dest": "/features.php" },
     { "src": "/pricing", "dest": "/pricing.php" },
     { "src": "/contact", "dest": "/contact.php" },
-    { "src": "/assets/(.*)", "dest": "/assets/$1" }
+    { "src": "/(.*).php", "dest": "/$1.php" }
   ]
 }

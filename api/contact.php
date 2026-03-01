@@ -1,13 +1,78 @@
 <?php
-$root = file_exists(dirname(__DIR__) . '/includes/config.php')
-        ? dirname(__DIR__) : __DIR__;
-require_once $root . '/includes/config.php';
+require_once 'includes/config.php';
 
 $pageTitle = 'Contact Us';
 $metaDesc  = 'Contact Bizisoft — Get in touch for a demo or to start your plan. Email: contact@bizisoft.com | Phone: +91 90307 61831 | Visakhapatnam.';
 
+/* ═══════════════════════════════════════════
+   FORM HANDLER — uses PHP built-in mail()
+   No PHPMailer, no database required.
+═══════════════════════════════════════════ */
+$formSuccess = false;
+$formError   = '';
+$formData    = [];
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['contact_submit'])) {
+
+  $name    = clean($_POST['name']    ?? '');
+  $phone   = clean($_POST['phone']   ?? '');
+  $email   = filter_var(trim($_POST['email'] ?? ''), FILTER_SANITIZE_EMAIL);
+  $biz     = clean($_POST['biz']     ?? '');
+  $plan    = clean($_POST['plan']    ?? '');
+  $message = clean($_POST['message'] ?? '');
+  $honey   = $_POST['website'] ?? '';
+
+  $formData = compact('name','phone','email','biz','plan','message');
+
+  if (!empty($honey)) {
+    $formSuccess = true; // silent for bots
+
+  } elseif (empty($name)) {
+    $formError = 'Please enter your name.';
+
+  } elseif (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+    $formError = 'Please enter a valid email address.';
+
+  } elseif (empty($message)) {
+    $formError = 'Please write a message.';
+
+  } else {
+
+    $body  = "NEW CONTACT FORM SUBMISSION\n";
+    $body .= "===================================\n\n";
+    $body .= "Name          : {$name}\n";
+    $body .= "Phone         : {$phone}\n";
+    $body .= "Email         : {$email}\n";
+    $body .= "Business Type : {$biz}\n";
+    $body .= "Interested In : {$plan}\n\n";
+    $body .= "Message:\n{$message}\n\n";
+    $body .= "===================================\n";
+    $body .= "Sent from bizisoft.com contact form\n";
+
+    $headers  = "From: Bizisoft Website <noreply@bizisoft.com>\r\n";
+    $headers .= "Reply-To: {$name} <{$email}>\r\n";
+    $headers .= "Content-Type: text/plain; charset=UTF-8\r\n";
+    $headers .= "X-Mailer: PHP/" . phpversion();
+
+    $subject = "New Enquiry from {$name} — Bizisoft";
+
+    $sent = mail(SITE_EMAIL, $subject, $body, $headers);
+
+    if ($sent) {
+      header('Location: contact.php?sent=1');
+      exit;
+    } else {
+      $formError = 'Sorry, your message could not be sent right now. Please email us directly at ' . SITE_EMAIL;
+    }
+  }
+}
+
+if (isset($_GET['sent']) && $_GET['sent'] === '1') {
+  $formSuccess = true;
+}
+
 $preselectedPlan = clean($_GET['plan'] ?? '');
-require_once $root . '/includes/header.php';
+require_once 'includes/header.php';
 ?>
 
 <!-- ══ HERO ══ -->
@@ -68,60 +133,54 @@ require_once $root . '/includes/header.php';
         </div>
       </div>
 
-      <!-- RIGHT: Contact Form — powered by Formspree -->
+      <!-- RIGHT: Contact Form -->
       <div class="contact-form-wrap reveal-right">
         <h3>SEND A MESSAGE</h3>
         <p>Fill in the form and we'll get back to you promptly.</p>
 
-        <!-- Success message shown after Formspree redirects back with ?sent=1 -->
-        <?php if (isset($_GET['sent']) && $_GET['sent'] === '1'): ?>
+        <?php if ($formSuccess): ?>
         <div class="alert alert-success">
           ✅ &nbsp;Your message has been sent! We'll contact you within 24 hours.
         </div>
         <?php endif; ?>
 
-        <!--
-          FORMSPREE SETUP (one-time, 2 minutes):
-          1. Go to https://formspree.io and sign up free
-          2. Click "New Form" → name it "Bizisoft Contact"
-          3. Copy your form endpoint (looks like https://formspree.io/f/xyzabcde)
-          4. Replace YOUR_FORMSPREE_ID below with just the ID part (e.g. xyzabcde)
-        -->
-        <form
-          action="https://formspree.io/f/YOUR_FORMSPREE_ID"
-          method="POST"
-          novalidate>
+        <?php if ($formError): ?>
+        <div class="alert alert-error">
+          ⚠️ &nbsp;<?= htmlspecialchars($formError) ?>
+        </div>
+        <?php endif; ?>
 
-          <!-- Tell Formspree where to redirect after success -->
-          <input type="hidden" name="_next"    value="https://YOUR-SITE.vercel.app/contact.php?sent=1" />
-          <!-- Email subject line in your inbox -->
-          <input type="hidden" name="_subject" value="New Enquiry — Bizisoft Website" />
+        <form method="POST" action="contact.php" novalidate>
+
           <!-- Bot trap -->
-          <input type="text"   name="_gotcha"  style="display:none;" tabindex="-1" autocomplete="off" />
+          <input type="text" name="website" style="display:none;" tabindex="-1" autocomplete="off" />
 
           <div class="form-row">
             <div class="form-group">
               <label for="f_name">Full Name *</label>
               <input type="text" id="f_name" name="name"
-                     placeholder="Your full name" required />
+                     placeholder="Your full name"
+                     value="<?= htmlspecialchars($formData['name'] ?? '') ?>" required />
             </div>
             <div class="form-group">
               <label for="f_phone">Phone / WhatsApp</label>
               <input type="tel" id="f_phone" name="phone"
-                     placeholder="+91 98765 43210" />
+                     placeholder="+91 98765 43210"
+                     value="<?= htmlspecialchars($formData['phone'] ?? '') ?>" />
             </div>
           </div>
 
           <div class="form-group">
             <label for="f_email">Email Address *</label>
             <input type="email" id="f_email" name="email"
-                   placeholder="you@yourrestaurant.com" required />
+                   placeholder="you@yourrestaurant.com"
+                   value="<?= htmlspecialchars($formData['email'] ?? '') ?>" required />
           </div>
 
           <div class="form-row">
             <div class="form-group">
               <label for="f_biz">Business Type</label>
-              <select id="f_biz" name="Business Type">
+              <select id="f_biz" name="biz">
                 <option value="">Select type…</option>
                 <?php
                 $bizTypes = [
@@ -134,14 +193,16 @@ require_once $root . '/includes/header.php';
                   'Fast Food Outlet',
                   'Other',
                 ];
-                foreach ($bizTypes as $t): ?>
-                <option><?= htmlspecialchars($t) ?></option>
+                foreach ($bizTypes as $t):
+                  $sel = (($formData['biz'] ?? '') === $t) ? 'selected' : '';
+                ?>
+                <option <?= $sel ?>><?= htmlspecialchars($t) ?></option>
                 <?php endforeach; ?>
               </select>
             </div>
             <div class="form-group">
               <label for="f_plan">Interested Plan</label>
-              <select id="f_plan" name="Interested Plan">
+              <select id="f_plan" name="plan">
                 <option value="">Select plan…</option>
                 <?php
                 $planOpts = [
@@ -151,7 +212,8 @@ require_once $root . '/includes/header.php';
                   'Not sure — need recommendation',
                 ];
                 foreach ($planOpts as $opt):
-                  $selected = (!empty($preselectedPlan) && strpos($opt, $preselectedPlan) !== false) ? 'selected' : '';
+                  $selPlan  = ($formData['plan'] ?? $preselectedPlan);
+                  $selected = (!empty($selPlan) && strpos($opt, $selPlan) !== false) ? 'selected' : '';
                 ?>
                 <option <?= $selected ?>><?= htmlspecialchars($opt) ?></option>
                 <?php endforeach; ?>
@@ -162,10 +224,11 @@ require_once $root . '/includes/header.php';
           <div class="form-group">
             <label for="f_msg">Message *</label>
             <textarea id="f_msg" name="message"
-                      placeholder="Tell us about your business, number of tables, or any specific questions…"></textarea>
+                      placeholder="Tell us about your business, number of tables, or any specific questions…"><?= htmlspecialchars($formData['message'] ?? '') ?></textarea>
           </div>
 
-          <button type="submit" class="btn btn-red"
+          <button type="submit" name="contact_submit" value="1"
+                  class="btn btn-red"
                   style="width:100%;justify-content:center;font-size:1rem;padding:16px;">
             Send Message →
           </button>
@@ -197,4 +260,4 @@ require_once $root . '/includes/header.php';
   </div>
 </section>
 
-<?php require_once $root . '/includes/footer.php'; ?>
+<?php require_once 'includes/footer.php'; ?>

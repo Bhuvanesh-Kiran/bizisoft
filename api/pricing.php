@@ -4,7 +4,7 @@ $metaDesc  = 'Bizisoft pricing plans — Starter ₹8,500, Growth ₹12,500, Bus
 require_once 'includes/header.php';
 ?>
 
-<section class="page-hero" style="background:linear-gradient(180deg,#0e0000 0%,var(--black) 100%); padding-bottom:60px;">
+<section class="page-hero" style="padding-top:140px; padding-bottom:80px;">
   <div class="hero-bg-text">PRICE</div>
   <div class="container" style="text-align:center; position:relative; z-index:1;">
     <div class="section-eyebrow reveal" style="justify-content:center;">Pricing Plans</div>

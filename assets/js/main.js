@@ -82,30 +82,28 @@ const counterObs = new IntersectionObserver((entries) => {
 
 document.querySelectorAll('.stats-row, .hero-stats').forEach(el => counterObs.observe(el));
 // ── THEME TOGGLE ─────────────────────────────────────
-// ── THEME TOGGLE LOGIC ─────────────────────────────────────
+// ── THEME TOGGLE UNIFIED LOGIC ───────────────────────
 function toggleTheme() {
   const body = document.body;
-  const isLight = body.classList.toggle('light-theme');
-  localStorage.setItem('bizi-theme', isLight ? 'light' : 'dark');
+  // Change to toggle 'dark-theme'
+  const isDark = body.classList.toggle('dark-theme');
+  localStorage.setItem('bizi-theme', isDark ? 'dark' : 'light');
 }
 
 (function() {
   const body = document.body;
 
-  // 1. Load saved preference on page load
-  if (localStorage.getItem('bizi-theme') === 'light') {
-    body.classList.add('light-theme');
+  // Set default behavior: If 'dark' is saved, apply it. 
+  // Otherwise, it stays light (the new default).
+  if (localStorage.getItem('bizi-theme') === 'dark') {
+    body.classList.add('dark-theme');
   }
 
-  // 2. Attach listeners to ALL theme toggle buttons (Desktop & Mobile)
-  // We use querySelectorAll to find every instance of the toggle
-  const themeButtons = document.querySelectorAll('#themeToggle, .mob-controls .theme-toggle');
-  
-  themeButtons.forEach(btn => {
-    btn.addEventListener('click', (e) => {
+  document.addEventListener('click', function(e) {
+    const btn = e.target.closest('#themeToggle, .theme-toggle');
+    if (btn) {
       e.preventDefault();
       toggleTheme();
-    });
+    }
   });
 })();
-

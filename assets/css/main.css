@@ -5,26 +5,26 @@
 
 /* ── VARIABLES ─────────────────────────────── */
 :root {
-  --red:        #CC0000;
-  --red-bright: #FF1A1A;
-  --red-dark:   #990000;
-  --red-glow:   rgba(204,0,0,0.18);
-  --black:      #0A0A0A;
-  --black2:     #111111;
-  --black3:     #181818;
-  --black4:     #222222;
-  --border:     rgba(255,255,255,0.07);
-  --border-red: rgba(204,0,0,0.3);
-  --text:       #EBEBEB;
-  --muted:      #777;
-  --muted2:     #999;
-  --white:      #FFFFFF;
-  --fh:         'Bebas Neue', sans-serif;
-  --fb:         'Barlow', sans-serif;
-  --r:          12px;
-  --rs:         8px;
-  --shadow:     0 24px 64px rgba(0,0,0,0.6);
-  --shadow-red: 0 8px 32px rgba(204,0,0,0.3);
+  --red:         #CC0000;
+  --red-bright:  #FF1A1A;
+  --red-dark:    #990000;
+  --red-glow:    rgba(204,0,0,0.1);
+  --black:       #FFFFFF; /* Default Background */
+  --black2:      #F8F8F8;
+  --black3:      #F0F0F0;
+  --black4:      #E8E8E8;
+  --border:      rgba(0,0,0,0.08);
+  --border-red:  rgba(204,0,0,0.2);
+  --text:        #111111; /* Default Text */
+  --muted:       #666666;
+  --muted2:      #444444;
+  --white:       #000000; /* Inverted for headings */
+  --fh:          'Bebas Neue', sans-serif;
+  --fb:          'Barlow', sans-serif;
+  --r:           12px;
+  --rs:          8px;
+  --shadow:      0 24px 64px rgba(0,0,0,0.1);
+  --shadow-red:  0 8px 32px rgba(204,0,0,0.2);
 }
 
 /* ── RESET ──────────────────────────────────── */
@@ -954,28 +954,46 @@ button.mob-cta {
   .hdr-right-group { display: none; }
 }
 
-/* ── LIGHT THEME OVERRIDES ─────────────────── */
-body.light-theme {
-  --black:   #FFFFFF; /* Changed from #F5F5F5 to pure White */
-  --black2:  #F8F8F8;
-  --black3:  #F0F0F0;
-  --black4:  #E8E8E8;
-  --border:  rgba(0,0,0,0.08);
-  --border-red: rgba(204,0,0,0.2);
-  --text:    #111111;
-  --muted:   #666666;
-  --muted2:  #444444;
-  --white:   #000000; /* Invert white variable for text clarity */
-  background-color: #FFFFFF !important;
-  color: #111111;
+/* ── DARK THEME OVERRIDES (Formerly the default) ── */
+body.dark-theme {
+  --black:       #0A0A0A;
+  --black2:      #111111;
+  --black3:      #181818;
+  --black4:      #222222;
+  --border:      rgba(255,255,255,0.07);
+  --border-red:  rgba(204,0,0,0.3);
+  --text:        #EBEBEB;
+  --muted:       #777;
+  --muted2:      #999;
+  --white:       #FFFFFF;
+  background-color: #0A0A0A !important;
+}
+
+/* Fix Header for Default Light Mode */
+#siteHeader {
+  background: rgba(255,255,255,0.9);
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+}
+body.dark-theme #siteHeader {
+  background: rgba(52, 50, 50, 0.95);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 /* Fix the Noise Overlay for Light Mode */
-body.light-theme::after {
-    opacity: 0.015; /* Lower opacity for white background */
-    filter: invert(1); /* Inverts the noise pattern so it's not dark specks on white */
+/* Noise pattern inverted for light background */
+body::after {
+  content: '';
+  position: fixed; inset: 0; pointer-events: none; z-index: 9999;
+  opacity: 0.015;
+  filter: invert(1); /* Invert for light mode */
+  background-image: url("data:image/svg+xml,...");
 }
 
+/* Switch filter back for dark mode */
+body.dark-theme::after {
+  opacity: 0.025;
+  filter: invert(0);
+}
 /* Ensure Page Hero and background containers reset */
 body.light-theme .page-hero {
     background: #FFFFFF !important;
@@ -1102,6 +1120,28 @@ body.light-theme .logo span { color: #111111 !important; }
   letter-spacing: 0.5px;
 }
 
+/* Pulse Animation */
+@keyframes whatsapp-pulse {
+  0% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.5); }
+  70% { box-shadow: 0 0 0 15px rgba(37, 211, 102, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0); }
+}
+
+.whatsapp-float {
+  animation: whatsapp-pulse 2s infinite;
+}
+
+/* Mobile adjustments */
+@media (max-width: 768px) {
+  .whatsapp-float {
+    bottom: 20px;
+    right: 20px;
+    padding: 12px;
+  }
+  .whatsapp-float span {
+    display: none; /* Hide text on mobile to save space */
+  }
+}
 /* Pulse Animation */
 @keyframes whatsapp-pulse {
   0% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.5); }

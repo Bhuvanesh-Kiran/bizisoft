@@ -607,7 +607,8 @@ body.dark-theme .sc-screenshot { box-shadow: 0 40px 100px rgba(0,0,0,0.6), 0 0 0
   .form-row { grid-template-columns: 1fr; }
   .big-cta-inner { flex-direction: column; gap: 24px; text-align: center; }
   .cta-actions { justify-content: center; }
-  .compare-table { display: none; }
+  .compare-table th, .compare-table td { padding: 10px 12px; font-size: 0.78rem; }
+  .compare-table th:first-child, .compare-table td:first-child { min-width: 120px; }
   .hero-stats { gap: 20px; }
   .page-hero { padding: 110px 0 60px; }
   .sc-section { padding: 56px 0; }

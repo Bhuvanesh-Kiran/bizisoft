@@ -9,13 +9,13 @@
   --red-bright:  #FF1A1A;
   --red-dark:    #990000;
   --red-glow:    rgba(204,0,0,0.1);
-  --black:       #FFFFFF; /* Default Background */
+  --black:       #FFFFFF; /* Pure White Background */
   --black2:      #F8F8F8;
   --black3:      #F0F0F0;
   --black4:      #E8E8E8;
   --border:      rgba(0,0,0,0.08);
   --border-red:  rgba(204,0,0,0.2);
-  --text:        #111111; /* Default Text */
+  --text:        #111111; /* Dark Text */
   --muted:       #666666;
   --muted2:      #444444;
   --white:       #000000; /* Inverted for headings */
@@ -29,11 +29,15 @@
 
 /* ── RESET ──────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: smooth; overflow-x: hidden; }
-body {
-  background: var(--black); color: var(--text);
-  font-family: var(--fb); font-size: 16px;
-  line-height: 1.65; overflow-x: hidden;
+
+html, body {
+  background-color: #FFFFFF !important; /* FORCED WHITE */
+  color: var(--text);
+  font-family: var(--fb);
+  font-size: 16px;
+  line-height: 1.65;
+  overflow-x: hidden;
+  min-height: 100%;
 }
 img { max-width: 100%; display: block; }
 a { text-decoration: none; color: inherit; }
@@ -966,7 +970,7 @@ body.dark-theme {
   --muted:       #777;
   --muted2:      #999;
   --white:       #FFFFFF;
-  background-color: #0A0A0A !important;
+  background-color: #0A0A0A !important; /* Force black in dark mode */
 }
 
 /* Fix Header for Default Light Mode */
@@ -982,11 +986,13 @@ body.dark-theme #siteHeader {
 /* Fix the Noise Overlay for Light Mode */
 /* Noise pattern inverted for light background */
 body::after {
+  body::after {
   content: '';
   position: fixed; inset: 0; pointer-events: none; z-index: 9999;
-  opacity: 0.015;
-  filter: invert(1); /* Invert for light mode */
-  background-image: url("data:image/svg+xml,...");
+  opacity: 0.012; /* Very subtle for light mode */
+  filter: invert(1); /* PREVENTS DARK SPECKS ON WHITE */
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
 }
 
 /* Switch filter back for dark mode */

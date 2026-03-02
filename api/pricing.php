@@ -140,17 +140,18 @@ require_once 'includes/header.php';
             ['Customer Display',             'yes',        'yes',        'yes'],
           ];
 
-          <?php function rc($v) {
+          foreach($rows as [$feat, $s, $p, $b]):
+            $cv = function($v) {
               if ($v === 'yes') return '<span class="yes">✓</span>';
               if ($v === 'no')  return '<span class="no">—</span>';
               return '<span style="color:var(--red);font-weight:700;font-size:0.8rem;">'.$v.'</span>';
-          } ?>
-          <?php foreach($rows as [$feat, $s, $p, $b]): ?>
+            };
+          ?>
           <tr>
             <td><?= $feat ?></td>
-            <td><?= rc($s) ?></td>
-            <td class="highlight"><?= rc($p) ?></td>
-            <td><?= rc($b) ?></td>
+            <td><?= $cv($s) ?></td>
+            <td class="highlight"><?= $cv($p) ?></td>
+            <td><?= $cv($b) ?></td>
           </tr>
           <?php endforeach; ?>
         </tbody>

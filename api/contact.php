@@ -81,7 +81,7 @@ require_once 'includes/header.php';
   <div class="container" style="text-align:center; position:relative; z-index:1;">
     <div class="section-eyebrow reveal" style="justify-content:center;">Get in Touch</div>
     <h1 class="display-heading reveal" style="margin-bottom:16px;">
-      LET'S <span class="red">GROW</span><br>YOUR BUSINESS<br><br>TOGETHER.</br>
+      LET'S <span class="red">GROW</span><br>YOUR BUSINESS<br>TOGETHER.
     </h1>
     <p class="section-sub reveal" style="margin:0 auto; font-size:1rem;">
       Have questions or ready to start? Our team will get back to you within 24 hours.

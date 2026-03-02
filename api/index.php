@@ -5,7 +5,7 @@ require_once 'includes/header.php';
 ?>
 
 <!-- ══ HERO ══ -->
-<section class="page-hero" style="padding-top:140px; padding-bottom:80px; background: linear-gradient(180deg, #0e0000 0%, var(--black) 100%);">
+<section class="page-hero" style="padding-top:140px; padding-bottom:80px;">
   <div class="hero-bg-text">FOOD</div>
   <div class="container">
     <div class="hero-grid">

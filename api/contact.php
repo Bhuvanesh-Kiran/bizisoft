@@ -128,7 +128,7 @@ require_once 'includes/header.php';
           <div class="contact-ic">🕐</div>
           <div>
             <div class="ci-label">Business Hours</div>
-            <div class="ci-value">Mon – Sat: 9:00 AM – 7:00 PM IST</div>
+            <div class="ci-value">Mon – Fri: 9:00 AM – 6:00 PM IST</div>
           </div>
         </div>
       </div>
@@ -165,7 +165,7 @@ require_once 'includes/header.php';
             <div class="form-group">
               <label for="f_phone">Phone / WhatsApp</label>
               <input type="tel" id="f_phone" name="phone"
-                     placeholder="+91 98765 43210"
+                     placeholder="+91 90307 61831"
                      value="<?= htmlspecialchars($formData['phone'] ?? '') ?>" />
             </div>
           </div>

@@ -47,7 +47,7 @@ require_once 'includes/header.php';
             <div>
               <div style="font-size:0.65rem;text-transform:uppercase;letter-spacing:2px;color:var(--muted);">Today's Revenue</div>
               <div style="font-family:var(--fh);font-size:2.2rem;letter-spacing:1px;color:var(--white);margin-top:4px;">₹24,850</div>
-              <div style="font-size:0.75rem;color:#4ade80;margin-top:3px;">↑ 18% vs yesterday</div>
+              <div style="font-size:0.75rem;color:#16a34a;margin-top:3px;">↑ 18% vs yesterday</div>
             </div>
             <div style="text-align:right;">
               <div style="font-size:0.65rem;text-transform:uppercase;letter-spacing:2px;color:var(--muted);">Orders</div>
@@ -57,14 +57,14 @@ require_once 'includes/header.php';
           </div>
           <div style="display:flex;align-items:flex-end;gap:6px;height:52px;margin-bottom:20px;">
             <?php foreach([25,45,35,70,55,85,65,90,72,88] as $h): ?>
-            <div style="flex:1;height:<?=$h?>%;background:<?=$h>70?'var(--red)':'rgba(255,255,255,0.1)'?>;border-radius:3px 3px 0 0;transition:height 0.3s;"></div>
+            <div style="flex:1;height:<?=$h?>%;background:<?=$h>70?'var(--red)':'rgba(0,0,0,0.08)'?>;border-radius:3px 3px 0 0;transition:height 0.3s;"></div>
             <?php endforeach; ?>
           </div>
           <?php foreach([['Table 04 — Biryani ×2','₹480','delivered'],['Takeaway — Thali ×3','₹360','preparing'],['Table 07 — Dosa Set','₹220','delivered']] as [$item,$price,$status]): ?>
           <div style="display:flex;justify-content:space-between;align-items:center;font-size:0.8rem;padding:8px 12px;background:var(--black3);border-radius:6px;margin-bottom:8px;">
             <span style="color:var(--muted2);"><?= $item ?></span>
             <span style="color:var(--text);font-weight:600;"><?= $price ?></span>
-            <span style="color:<?=$status==='delivered'?'#4ade80':'#facc15'?>;font-size:0.7rem;text-transform:uppercase;"><?= ucfirst($status) ?></span>
+            <span style="color:<?=$status==='delivered'?'#16a34a':'#b45309'?>;font-size:0.7rem;text-transform:uppercase;"><?= ucfirst($status) ?></span>
           </div>
           <?php endforeach; ?>
         </div>
@@ -89,28 +89,15 @@ require_once 'includes/header.php';
   </div>
 </div>
 
-<!-- ══════════════════════════════════════════════
-     SHOWCASE SECTIONS — 4 feature highlights
-     Layout mirrors bizisoft.com exactly:
-     screenshot on one side, text on the other
-     alternating per row
-══════════════════════════════════════════════ -->
+<!-- ══ SHOWCASE SECTIONS ══ -->
 
-<!-- 1. Streamline Order Management — image LEFT, text RIGHT -->
+<!-- 1. Order Management -->
 <section class="sc-section">
   <div class="container">
     <div class="sc-row reveal">
-
       <div class="sc-img-col">
-        <!--
-          SAVE your screenshot as: assets/images/sc-orders.png
-          (the image showing order cards / billing screen from bizisoft.com)
-        -->
-        <img src="assets/img/order-management.png"
-             alt="Order Management Dashboard"
-             class="sc-screenshot" />
+        <img src="assets/img/order-management.png" alt="Order Management Dashboard" class="sc-screenshot" />
       </div>
-
       <div class="sc-text-col">
         <h2 class="sc-heading">Streamline Order Management</h2>
         <p class="sc-desc">Never lose track of an order again. All your customer orders — from dine-in to takeout — are organized and easily accessible in one place. Speed up service and keep your kitchen running smoothly.</p>
@@ -122,16 +109,14 @@ require_once 'includes/header.php';
         </ul>
         <a href="features.php" class="btn btn-ghost" style="margin-top:28px;">Learn More →</a>
       </div>
-
     </div>
   </div>
 </section>
 
-<!-- 2. Optimize Table Reservations — text LEFT, image RIGHT -->
+<!-- 2. Table Reservations -->
 <section class="sc-section sc-alt">
   <div class="container">
     <div class="sc-row sc-row-reverse reveal">
-
       <div class="sc-text-col">
         <h2 class="sc-heading">Optimize Table Reservations</h2>
         <p class="sc-desc">Maximize seating efficiency with real-time table tracking and reservations. Reduce wait times and ensure no table sits empty during peak hours, improving customer experience and turnover.</p>
@@ -143,36 +128,20 @@ require_once 'includes/header.php';
         </ul>
         <a href="features.php" class="btn btn-ghost" style="margin-top:28px;">Learn More →</a>
       </div>
-
       <div class="sc-img-col">
-        <!--
-          SAVE your screenshot as: assets/images/sc-reservations.png
-          (the image showing the reservation list with date picker)
-        -->
-        <img src="assets/img/table-reservation.png"
-             alt="Table Reservations"
-             class="sc-screenshot" />
+        <img src="assets/img/table-reservation.png" alt="Table Reservations" class="sc-screenshot" />
       </div>
-
     </div>
   </div>
 </section>
 
-<!-- 3. Effortless Menu Management — image LEFT, text RIGHT -->
+<!-- 3. Menu Management -->
 <section class="sc-section">
   <div class="container">
     <div class="sc-row reveal">
-
       <div class="sc-img-col">
-        <!--
-          SAVE your screenshot as: assets/images/sc-menu.png
-          (the image showing the billing / order detail screen)
-        -->
-        <img src="assets/img/effortless.png"
-             alt="Menu Management"
-             class="sc-screenshot" />
+        <img src="assets/img/effortless.png" alt="Menu Management" class="sc-screenshot" />
       </div>
-
       <div class="sc-text-col">
         <h2 class="sc-heading">Effortless Menu Management</h2>
         <p class="sc-desc">Easily add, edit, or remove items from your menu on the go. Highlight specials, update prices, and keep everything in sync across all platforms, so your staff and customers always see the latest offerings.</p>
@@ -184,16 +153,14 @@ require_once 'includes/header.php';
         </ul>
         <a href="features.php" class="btn btn-ghost" style="margin-top:28px;">Learn More →</a>
       </div>
-
     </div>
   </div>
 </section>
 
-<!-- 4. Reports & Analytics — text LEFT, image RIGHT -->
+<!-- 4. Reports & Analytics -->
 <section class="sc-section sc-alt">
   <div class="container">
     <div class="sc-row sc-row-reverse reveal">
-
       <div class="sc-text-col">
         <h2 class="sc-heading">Powerful Reports &amp; Analytics</h2>
         <p class="sc-desc">Get complete visibility into your restaurant's performance. Track revenue, today's orders, top-selling dishes, and payment methods — all in one real-time dashboard that helps you make smarter decisions.</p>
@@ -205,17 +172,41 @@ require_once 'includes/header.php';
         </ul>
         <a href="features.php" class="btn btn-ghost" style="margin-top:28px;">Learn More →</a>
       </div>
-
       <div class="sc-img-col">
-        <!--
-          SAVE your screenshot as: assets/images/sc-reports.png
-          (the image showing the full dashboard with statistics)
-        -->
-        <img src="assets/img/dashboard.png"
-             alt="Reports and Analytics Dashboard"
-             class="sc-screenshot" />
+        <img src="assets/img/dashboard.png" alt="Reports and Analytics Dashboard" class="sc-screenshot" />
       </div>
+    </div>
+  </div>
+</section>
 
+<!-- ══ WHO IS IT FOR ══ -->
+<section class="who-section">
+  <div class="container">
+    <div class="section-header center reveal">
+      <div class="section-eyebrow">Who It's For</div>
+      <h2 class="section-heading">BUILT FOR EVERY<br><span style="color:var(--red);">FOOD BUSINESS</span></h2>
+      <p class="section-sub">Whether you run a single outlet or a multi-branch chain, Bizisoft adapts to your business.</p>
+    </div>
+    <div class="who-grid reveal">
+      <?php
+      $whoFor = [
+        ['🍽️', 'Restaurant',         'Single Outlet',          'Perfect for standalone restaurants wanting full POS, billing and table management.'],
+        ['🥘', 'Tiffin Centre',       'Home & Commercial',      'Manage bulk daily orders, subscriptions, and home-delivery from one dashboard.'],
+        ['🏪', 'Multi-Branch',        'Restaurant Chain',       'Control up to 5 branches with unified menus, staff roles, and consolidated reports.'],
+        ['☁️', 'Cloud Kitchen',       'Delivery-First',         'No dine-in? No problem. Track every delivery order, payout, and kitchen ticket.'],
+        ['🏫', 'Cafeteria / Canteen', 'Corporate & Institutional','Handle high-volume, fast-paced service with quick billing and KOT printing.'],
+        ['🏨', 'Hotel Restaurant',    'In-House Dining',        'Manage room service, restaurant tables, and bar from one integrated system.'],
+        ['🍟', 'Fast Food Outlet',    'Quick Service',          'Speed up service with quick-add menus, instant KOT, and real-time order tracking.'],
+      ];
+      foreach ($whoFor as [$icon, $title, $sub, $desc]):
+      ?>
+      <div class="who-card">
+        <div class="who-icon"><?= $icon ?></div>
+        <div class="who-title"><?= $title ?></div>
+        <div class="who-sub"><?= $sub ?></div>
+        <p class="who-desc"><?= $desc ?></p>
+      </div>
+      <?php endforeach; ?>
     </div>
   </div>
 </section>

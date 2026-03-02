@@ -623,3 +623,108 @@ body.dark-theme .sc-screenshot { box-shadow: 0 40px 100px rgba(0,0,0,0.6), 0 0 0
   .hero-actions { flex-direction: column; }
   .btn { width: 100%; justify-content: center; }
 }
+
+/* ══════════════════════════════════════════════
+   WHO IS IT FOR SECTION
+══════════════════════════════════════════════ */
+.who-section {
+  padding: 100px 0;
+  background: var(--black2);
+  border-top: 1px solid var(--border);
+}
+.who-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+/* 7 items — last row: 3 centered */
+.who-grid .who-card:nth-child(5) { grid-column: 1; }
+.who-grid .who-card:nth-child(6) { grid-column: 2; }
+.who-grid .who-card:nth-child(7) { grid-column: 3; }
+
+.who-card {
+  background: var(--black);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 28px 22px;
+  text-align: center;
+  transition: border-color 0.25s, transform 0.25s, box-shadow 0.25s;
+  position: relative;
+  overflow: hidden;
+}
+.who-card::before {
+  content: '';
+  position: absolute; bottom: 0; left: 0; right: 0; height: 3px;
+  background: var(--red);
+  transform: scaleX(0); transform-origin: center;
+  transition: transform 0.3s;
+}
+.who-card:hover {
+  border-color: var(--border-red);
+  transform: translateY(-4px);
+  box-shadow: var(--shadow);
+}
+.who-card:hover::before { transform: scaleX(1); }
+
+.who-icon {
+  font-size: 2.8rem;
+  margin-bottom: 14px;
+  display: block;
+  line-height: 1;
+}
+.who-title {
+  font-family: var(--fh);
+  font-size: 1.15rem;
+  letter-spacing: 1px;
+  color: var(--white);
+  margin-bottom: 4px;
+}
+.who-sub {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--red);
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+.who-desc {
+  font-size: 0.82rem;
+  color: var(--muted);
+  line-height: 1.65;
+  font-weight: 300;
+}
+
+@media (max-width: 1024px) {
+  .who-grid { grid-template-columns: repeat(3, 1fr); }
+  .who-grid .who-card:nth-child(5),
+  .who-grid .who-card:nth-child(6),
+  .who-grid .who-card:nth-child(7) { grid-column: auto; }
+}
+@media (max-width: 768px) {
+  .who-grid { grid-template-columns: repeat(2, 1fr); }
+  .who-section { padding: 60px 0; }
+}
+@media (max-width: 480px) {
+  .who-grid { grid-template-columns: 1fr; }
+}
+
+/* ══════════════════════════════════════════════
+   DARK THEME — HEADER & FOOTER GREY
+   (as per bizisoft.com dark mode look)
+══════════════════════════════════════════════ */
+body.dark-theme #siteHeader {
+  background: rgba(30, 28, 28, 0.97) !important;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+body.dark-theme #siteHeader.scrolled {
+  background: rgba(30, 28, 28, 1) !important;
+  box-shadow: 0 2px 20px rgba(0,0,0,0.4);
+}
+body.dark-theme #siteFooter {
+  background: #1e1c1c !important;
+  border-top: 1px solid rgba(255,255,255,0.06);
+}
+body.dark-theme .mob-nav {
+  background: #1e1c1c;
+  border-left-color: rgba(255,255,255,0.06);
+}

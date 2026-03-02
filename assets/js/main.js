@@ -1,3 +1,4 @@
+
 // ── MOBILE NAV ──────────────────────────────────────
 function openMob() {
   document.getElementById('mobNav').classList.add('open');
@@ -17,7 +18,6 @@ window.addEventListener('scroll', () => {
 }, { passive: true });
 
 // ── SCROLL REVEAL ────────────────────────────────────
-// FIX 1: lower threshold to 0.01 so elements trigger earlier
 const revealObs = new IntersectionObserver((entries) => {
   entries.forEach(e => {
     if (e.isIntersecting) {
@@ -29,8 +29,6 @@ const revealObs = new IntersectionObserver((entries) => {
 
 document.querySelectorAll('.reveal, .reveal-left, .reveal-right').forEach(el => revealObs.observe(el));
 
-// FIX 3: Fallback — force-show ALL reveal elements after 400ms
-// This guarantees nothing stays invisible on direct page landings
 setTimeout(() => {
   document.querySelectorAll('.reveal, .reveal-left, .reveal-right').forEach(el => {
     el.classList.add('visible');
@@ -47,7 +45,7 @@ document.querySelectorAll('.faq-q').forEach(btn => {
   });
 });
 
-// ── SMOOTH SCROLL for anchor links ───────────────────
+// ── SMOOTH SCROLL ────────────────────────────────────
 document.querySelectorAll('a[href^="#"]').forEach(a => {
   a.addEventListener('click', e => {
     const target = document.querySelector(a.getAttribute('href'));
@@ -81,29 +79,24 @@ const counterObs = new IntersectionObserver((entries) => {
 }, { threshold: 0.4 });
 
 document.querySelectorAll('.stats-row, .hero-stats').forEach(el => counterObs.observe(el));
+
 // ── THEME TOGGLE ─────────────────────────────────────
-// ── THEME TOGGLE UNIFIED LOGIC ───────────────────────
-function toggleTheme() {
-  const body = document.body;
-  // Change to toggle 'dark-theme'
-  const isDark = body.classList.toggle('dark-theme');
-  localStorage.setItem('bizi-theme', isDark ? 'dark' : 'light');
-}
-
-(function() {
+// Light is DEFAULT. Dark theme adds class 'dark-theme'.
+// Preference saved in localStorage as 'dark' or 'light'.
+(function () {
   const body = document.body;
 
-  // Set default behavior: If 'dark' is saved, apply it. 
-  // Otherwise, it stays light (the new default).
+  // On load: apply saved dark preference if it exists
   if (localStorage.getItem('bizi-theme') === 'dark') {
     body.classList.add('dark-theme');
   }
 
-  document.addEventListener('click', function(e) {
+  // Listen for clicks on any theme toggle button
+  document.addEventListener('click', function (e) {
     const btn = e.target.closest('#themeToggle, .theme-toggle');
-    if (btn) {
-      e.preventDefault();
-      toggleTheme();
-    }
+    if (!btn) return;
+    e.preventDefault();
+    const isDark = body.classList.toggle('dark-theme');
+    localStorage.setItem('bizi-theme', isDark ? 'dark' : 'light');
   });
 })();

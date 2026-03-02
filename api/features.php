@@ -10,7 +10,7 @@ require_once 'includes/header.php';
   <div class="container" style="text-align:center; position:relative; z-index:1;">
     <div class="section-eyebrow reveal" style="justify-content:center;">All Features</div>
     <h1 class="display-heading reveal" style="margin-bottom:16px;">
-      EVERYTHING<br>YOUR <span class="red">RESTAURANT</span><br><span class="dim">NEEDS.</span>
+      EVERYTHING<br>YOUR <span class="red">RESTAURANT</span><br>NEEDS.
     </h1>
     <p class="section-sub reveal" style="margin:0 auto; font-size:1rem;">
       Bizisoft is packed with tools built specifically for restaurants, tiffin centres, cloud kitchens, and all food businesses.

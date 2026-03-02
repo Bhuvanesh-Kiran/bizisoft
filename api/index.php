@@ -14,7 +14,7 @@ require_once 'includes/header.php';
         <h1 class="display-heading">
           MANAGE<br>
           YOUR <span class="red">FOOD</span><br>
-          <span class="dim">BUSINESS.</span>
+          BUSINESS.
         </h1>
         <p style="font-size:1.05rem; color:var(--muted2); max-width:480px; margin-top:20px; font-weight:300; line-height:1.8;">
           From single restaurants to multi-branch tiffin centres — Bizisoft gives you POS, orders, tables, billing, and analytics in one powerful platform.
